@@ -102,7 +102,7 @@ for i in range(grid_width):
 
         # Si la celda es naranja, agregar la ❌
         if (i, j) in danger_zones:
-            canvas.create_text(x1 + cell_size / 2, y1 + cell_size / 2, text="❌", font=("Arial", 18, "bold"), fill="black")
+            canvas.create_text(x1 + cell_size / 2, y1 + cell_size / 2, text="❌", font=("Arial", 18, "bold"), fill="red")
 
 
 # Posición inicial del jugador y meta
