@@ -20,7 +20,7 @@ current_state = State.INICIO
 current_path = None  
 
 # Definir costes según el tipo de terreno
-costs = {"normal": 1, "moderate": 3, "difficult": 5}
+costs = {"normal": 1, "moderate": 3, "difficult": 5, "peligroso": 20}  # Peligroso = costoso para evitarlo
 
 # Crear la ventana
 window = tk.Tk()
@@ -40,11 +40,15 @@ state_label.pack()
 # Cargar imágenes
 panda_img = Image.open("panda.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
 panda_img = ImageTk.PhotoImage(panda_img)
-window.panda_img = panda_img  # Evitar que se borre
+window.panda_img = panda_img  
 
 moneda_img = Image.open("moneda.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
 moneda_img = ImageTk.PhotoImage(moneda_img)
-window.moneda_img = moneda_img  # Evitar que se borre
+window.moneda_img = moneda_img  
+
+grumpy_img = Image.open("grumpy.png").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
+grumpy_img = ImageTk.PhotoImage(grumpy_img)
+window.grumpy_img = grumpy_img  
 
 # Crear el grafo
 graph = nx.grid_2d_graph(grid_width, grid_height)
@@ -54,12 +58,19 @@ obstacles = {(1, 1), (2, 3), (3, 5), (4, 7), (5, 9), (6, 2), (7, 4), (8, 6), (9,
 moderate_terrain = {(1, 4), (3, 3), (9, 5), (6, 8)}
 difficult_terrain = {(4, 8), (7, 7), (5, 5)}
 
+# 🟠 Ubicación de "Grumpy" y sus celdas de peligro
+grumpy_pos = (5, 3)
+danger_zones = {(grumpy_pos[0] - 1, grumpy_pos[1]), (grumpy_pos[0] + 1, grumpy_pos[1]),
+                (grumpy_pos[0], grumpy_pos[1] - 1), (grumpy_pos[0], grumpy_pos[1] + 1)}
+
 # Asignar costes
 for i, j in graph.edges():
     if i in moderate_terrain or j in moderate_terrain:
         graph[i][j]['weight'] = costs["moderate"]
     elif i in difficult_terrain or j in difficult_terrain:
         graph[i][j]['weight'] = costs["difficult"]
+    elif i in danger_zones or j in danger_zones:
+        graph[i][j]['weight'] = costs["peligroso"]  # Coste alto para evitar estas celdas
     else:
         graph[i][j]['weight'] = costs["normal"]
 
@@ -69,21 +80,30 @@ for obstacle in obstacles:
         graph.remove_node(obstacle)
 
 # Dibujar cuadrícula
+# Dibujar cuadrícula con colores y agregar ❌ en celdas naranjas
 for i in range(grid_width):
     for j in range(grid_height):
         x1, y1 = i * cell_size, j * cell_size
         x2, y2 = x1 + cell_size, y1 + cell_size
 
         if (i, j) in obstacles:
-            color = "black"
+            color = "black"  # Obstáculo
         elif (i, j) in moderate_terrain:
-            color = "yellow"
+            color = "yellow"  # Terreno mediano
         elif (i, j) in difficult_terrain:
-            color = "red"
+            color = "red"  # Terreno difícil
+        elif (i, j) in danger_zones:  # Celdas naranjas
+            color = "orange"
         else:
-            color = "white"
+            color = "light green"  # Terreno normal
 
+        # Dibujar la celda
         canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
+
+        # Si la celda es naranja, agregar la ❌
+        if (i, j) in danger_zones:
+            canvas.create_text(x1 + cell_size / 2, y1 + cell_size / 2, text="❌", font=("Arial", 18, "bold"), fill="black")
+
 
 # Posición inicial del jugador y meta
 player_pos = (0, 0)
@@ -101,6 +121,13 @@ goal = canvas.create_image(
     goal_pos[0] * cell_size + cell_size // 2,
     goal_pos[1] * cell_size + cell_size // 2,
     image=window.moneda_img
+)
+
+# Dibujar "Grumpy"
+grumpy = canvas.create_image(
+    grumpy_pos[0] * cell_size + cell_size // 2,
+    grumpy_pos[1] * cell_size + cell_size // 2,
+    image=window.grumpy_img
 )
 
 # Heurística Manhattan
@@ -129,6 +156,8 @@ def change_counter(new_pos):
         counter += 3
     elif new_pos in difficult_terrain:
         counter += 5
+    elif new_pos in danger_zones:
+        counter += 10  # Penalización alta si pasa por zona de peligro
     else:
         counter += 1
     counter_label.config(text=f"Contador: {counter}")
@@ -150,7 +179,7 @@ def move_player(path, index=1):
         new_x = new_pos[0] * cell_size + cell_size // 2
         new_y = new_pos[1] * cell_size + cell_size // 2
         change_counter(new_pos)
-        canvas.coords(player, new_x, new_y)  # Mueve la imagen del panda
+        canvas.coords(player, new_x, new_y)
         player_pos = new_pos
         window.after(200, lambda: move_player(path, index + 1))
     else:
