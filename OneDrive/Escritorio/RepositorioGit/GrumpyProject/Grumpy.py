@@ -37,11 +37,14 @@ counter_label.pack()
 state_label = tk.Label(window, text=f"Estado: {current_state}", font=("Arial", 12))
 state_label.pack()
 
-# Cargar imagen del panda
-panda_img = Image.open("panda.jpg")
-panda_img = panda_img.resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
+# Cargar imágenes
+panda_img = Image.open("panda.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
 panda_img = ImageTk.PhotoImage(panda_img)
-window.panda_img = panda_img  # Evitar que se borre por el recolector de basura
+window.panda_img = panda_img  # Evitar que se borre
+
+moneda_img = Image.open("moneda.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
+moneda_img = ImageTk.PhotoImage(moneda_img)
+window.moneda_img = moneda_img  # Evitar que se borre
 
 # Crear el grafo
 graph = nx.grid_2d_graph(grid_width, grid_height)
@@ -93,13 +96,11 @@ player = canvas.create_image(
     image=window.panda_img
 )
 
-# Dibujar meta
-canvas.create_oval(
-    goal_pos[0] * cell_size + 10, 
-    goal_pos[1] * cell_size + 10,
-    (goal_pos[0] + 1) * cell_size - 10, 
-    (goal_pos[1] + 1) * cell_size - 10,
-    fill="green"
+# Dibujar meta (imagen de la moneda)
+goal = canvas.create_image(
+    goal_pos[0] * cell_size + cell_size // 2,
+    goal_pos[1] * cell_size + cell_size // 2,
+    image=window.moneda_img
 )
 
 # Heurística Manhattan
@@ -111,7 +112,6 @@ def change_state(new_state):
     global current_state, current_path
     current_state = new_state
     state_label.config(text=f"Estado: {current_state}")
-    print(f"Estado actual: {current_state}")
 
     if current_state == State.BUSCANDO_CAMINO:
         find_path()
