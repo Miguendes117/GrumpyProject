@@ -39,15 +39,15 @@ state_label = tk.Label(window, text=f"Estado: {current_state}", font=("Arial", 1
 state_label.pack()
 
 # Cargar imágenes
-panda_img = Image.open("panda.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
+panda_img = Image.open("images/panda.jpg").resize((cell_size - 10, cell_size - 10), Image.Resampling.LANCZOS)
 panda_img = ImageTk.PhotoImage(panda_img)
 window.panda_img = panda_img  
 
-moneda_img = Image.open("moneda.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
+moneda_img = Image.open("images/moneda.jpg").resize((cell_size - 10, cell_size - 10), Image.Resampling.LANCZOS)
 moneda_img = ImageTk.PhotoImage(moneda_img)
 window.moneda_img = moneda_img  
 
-grumpy_img = Image.open("grumpy.jpg").resize((cell_size - 10, cell_size - 10), Image.LANCZOS)
+grumpy_img = Image.open("images/grumpy.jpg").resize((cell_size - 10, cell_size - 10), Image.Resampling.LANCZOS)
 grumpy_img = ImageTk.PhotoImage(grumpy_img)
 window.grumpy_img = grumpy_img  
 
@@ -107,7 +107,7 @@ for i in range(grid_width):
 
 
 # Posición inicial del jugador y meta
-player_pos = (0, 0)
+player_pos = (6, 0)
 goal_pos = (9, 9)
 
 # Dibujar jugador (imagen del panda)
