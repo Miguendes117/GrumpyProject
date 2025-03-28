@@ -1,0 +1,13 @@
+.android/
+.arduinoIDE/
+.bash_history
+.git-for-windows-updater
+.gitconfig
+.gradle/
+.lemminx/
+Documents/
+Downloads/
+Videos/
+*.lnk
+*.ini
+*.log
