@@ -1,0 +1,35 @@
+Características Clave del Algoritmo Genético Implementado:
+Representación del Cromosoma: Cada individuo es un camino representado como una secuencia de coordenadas.
+
+Función de Fitness: Evalúa los caminos considerando:
+
+Si llega a la meta
+
+Costo total del terreno
+
+Pasos repetidos
+
+Longitud del camino
+
+Selección por Torneo: Selecciona los mejores individuos para reproducción.
+
+Operadores Genéticos:
+
+Cruzamiento: Combina dos caminos en un punto aleatorio
+
+Mutación: Modifica un paso aleatorio del camino
+
+Elitismo: Conserva los mejores individuos entre generaciones
+
+Visualización: Muestra la evolución del fitness en tiempo real
+
+
+
+Ventajas sobre A*:
+Optimización multi-objetivo: Puede considerar varios factores (costo, seguridad, longitud) simultáneamente.
+
+Tolerancia a cambios: Se adapta mejor si el entorno cambia dinámicamente.
+
+Exploración diversa: Examina múltiples soluciones potenciales en paralelo.
+
+Flexibilidad: Fácil de modificar para incorporar nuevos criterios de optimización.
