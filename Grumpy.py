@@ -333,9 +333,10 @@ def mover_grumpus():
     actualizar_grafo()
     
     # Verificar si atrapó al jugador
-    if grumpy_pos == player_pos:
-        messagebox.showinfo("Game Over", "¡El Grumpus te atrapó!")
-        reiniciar_nivel()
+   # if grumpy_pos == player_pos:
+    #    messagebox.showinfo("Game Over", "¡El Grumpus te atrapó!")
+    #    #reiniciar_nivel()
+    #    window.after(500, reset_game)
 
 # Función de movimiento del jugador
 def mover_jugador(path, index=1):
@@ -366,7 +367,7 @@ def mover_jugador(path, index=1):
             window.after(300, lambda: mover_jugador(path, index+1))
         else:
             messagebox.showinfo("Game Over", "¡El Grumpus te atrapó!")
-            reiniciar_nivel()
+            window.after(500, reset_game)
     else:
         nivel_completado()
 
@@ -378,6 +379,60 @@ def encontrar_camino():
     except:
         messagebox.showinfo("Error", "No hay camino disponible")
         reiniciar_nivel()
+
+def reset_game():
+    global nivel_actual, counter, grumpus, player_pos, goal_pos, grumpy_pos, danger_zones
+    global player, goal, grumpy_dibujo, window, canvas, info_frame
+    
+    # Reiniciar las variables
+    nivel_actual = 1
+    counter = 0
+    grumpus = Grumpus(nivel_actual)
+    player_pos = (0, 0)
+    goal_pos = (9, 9)
+    
+    # Cambiar la posición del Grumpus (Evitando la posición del jugador o la meta)
+    while True:
+        grumpy_pos = (random.randint(0, grid_width-1), random.randint(0, grid_height-1))
+        if grumpy_pos != player_pos and grumpy_pos != goal_pos and grumpy_pos not in obstacles:
+            break
+    
+    danger_zones = set()
+    
+    # Limpiar el canvas y recrear todos los elementos
+    canvas.delete("all")
+    
+    # Generar nuevo mapa
+    generar_mapa_aleatorio()
+    actualizar_grafo()
+    dibujar_mapa()
+    
+    # Recrear los objetos del juego
+    player = canvas.create_image(
+        player_pos[0]*cell_size+cell_size//2, 
+        player_pos[1]*cell_size+cell_size//2, 
+        image=panda_img
+    )
+    goal = canvas.create_image(
+        goal_pos[0]*cell_size+cell_size//2,
+        goal_pos[1]*cell_size+cell_size//2,
+        image=moneda_img
+    )
+    grumpy_dibujo = canvas.create_image(
+        grumpy_pos[0]*cell_size+cell_size//2,
+        grumpy_pos[1]*cell_size+cell_size//2,
+        image=grumpy_img
+    )
+    
+    # Actualizar la UI
+    window.title(f"Grumpy - Nivel {nivel_actual}")
+    info_frame.children['!label'].config(text=f"Nivel: {nivel_actual}")
+    info_frame.children['!label2'].config(text=f"Contador: {counter}")
+    genes_text = f"Grumpus - Mov: {'Sí' if grumpus.movilidad == 2 else 'No'} Vel: {grumpus.velocidad} Agr: {grumpus.agresividad:.1f} Vis: {grumpus.visibilidad}"
+    info_frame.children['!label3'].config(text=genes_text)
+    
+    # Reiniciar el juego
+    window.after(500, encontrar_camino)
 
 # Funciones de gestión del juego
 def nivel_completado():
